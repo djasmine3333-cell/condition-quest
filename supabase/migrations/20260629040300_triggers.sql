@@ -1,0 +1,7 @@
+create or replace function public.set_updated_at() returns trigger language plpgsql as $$ begin new.updated_at=now(); return new; end; $$;
+create trigger profiles_set_updated_at before update on public.profiles for each row execute function public.set_updated_at();
+create trigger quests_set_updated_at before update on public.quests for each row execute function public.set_updated_at();
+create or replace function public.prevent_profile_privilege_escalation() returns trigger language plpgsql as $$ begin if auth.role()='service_role' then return new; end if; if new.role is distinct from old.role then raise exception 'role を直接変更することはできません'; end if; if new.company_id is distinct from old.company_id then raise exception 'company_id を直接変更することはできません'; end if; return new; end; $$;
+create trigger profiles_prevent_privilege_escalation before update on public.profiles for each row execute function public.prevent_profile_privilege_escalation();
+create or replace function public.handle_new_user() returns trigger language plpgsql security definer set search_path=public as $$ declare v_company_id uuid; v_nickname text; begin v_company_id:=(new.raw_user_meta_data->>'company_id')::uuid; v_nickname:=new.raw_user_meta_data->>'nickname'; if v_company_id is null or v_nickname is null then raise exception '企業情報またはニックネームが指定されていません'; end if; insert into public.profiles (id,company_id,nickname) values (new.id,v_company_id,v_nickname); return new; end; $$;
+create trigger on_auth_user_created after insert on auth.users for each row execute function public.handle_new_user();

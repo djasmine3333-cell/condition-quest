@@ -1,0 +1,4 @@
+import { z } from "zod";
+export const QUEST_CATEGORIES = ["exercise","posture","hydration","nutrition","sleep","mental","focus"] as const;
+export const questFormSchema = z.object({ title: z.string().trim().min(1,"クエスト名を入力してください").max(100), description: z.string().trim().min(1,"本文を入力してください").max(500), category: z.enum(QUEST_CATEGORIES), durationSeconds: z.coerce.number().int().min(1).max(600), points: z.coerce.number().int().min(1).max(1000), scheduledAtLocal: z.string().min(1,"配信日時を入力してください"), expiresAtLocal: z.string().min(1,"表示期限を入力してください"), notificationTitle: z.string().trim().min(1,"通知タイトルを入力してください").max(60), notificationBody: z.string().trim().min(1,"通知本文を入力してください").max(120), status: z.enum(["draft","scheduled","published","stopped"]) }).refine(data=>data.expiresAtLocal>data.scheduledAtLocal,{ message:"表示期限は配信日時より後に設定してください", path:["expiresAtLocal"] });
+export type QuestFormInput = z.infer<typeof questFormSchema>;

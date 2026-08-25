@@ -1,0 +1,2 @@
+create or replace function public.is_super_admin() returns boolean language sql security definer set search_path=public stable as $$ select exists (select 1 from public.profiles where id=auth.uid() and role='super_admin'); $$;
+create or replace function public.current_company_id() returns uuid language sql security definer set search_path=public stable as $$ select company_id from public.profiles where id=auth.uid(); $$;

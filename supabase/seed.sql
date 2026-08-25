@@ -1,0 +1,2 @@
+insert into public.daily_quests (title,description,category,points,sort_order,is_active) values ('朝にたんぱく質を摂る','朝食でたんぱく質を意識して摂りましょう。','nutrition',5,1,true),('1日7,000歩以上歩く','今日の合計歩数が7,000歩を超えるように動きましょう。','exercise',5,2,true),('7時間以上寝る','今日は7時間以上の睡眠を目指しましょう。','sleep',5,3,true) on conflict do nothing;
+insert into public.companies (name,company_code) values ('サンプル株式会社','DEMO-COMPANY') on conflict (company_code) do nothing;
